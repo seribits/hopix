@@ -1,0 +1,24 @@
+version: "2"
+services:
+  hopix-web:
+    volumes:
+      - ./hopix-web:/usr/src/app
+    env_file:
+      - ./hopix-web/envs/web_secrets.env
+  hopix-core:
+    volumes:
+      - ./hopix-core:/usr/src/app
+    env_file:
+      - ./hopix-core/envs/core_db_secrets.env
+      - ./hopix-core/envs/core_pg_secrets.env
+      - ./hopix-core/envs/core_secrets.env
+  seriauth:
+    volumes:
+      - ./seriauth:/usr/src/app
+    env_file:
+      - ./seriauth/envs/seriauth_db_secrets.env
+      - ./seriauth/envs/seriauth_secrets.env
+      - ./seriauth/envs/seriauth_super_permissions_secrets.env
+  proxy:
+    volumes:
+      - ./proxy/config:/etc/nginx/conf.d

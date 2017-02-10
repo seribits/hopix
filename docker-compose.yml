@@ -1,0 +1,58 @@
+version: "2"
+services:
+  data-hopix-core:
+    image: busybox:latest
+    volumes:
+      - hopix_core_postgres:/var/lib/postgresql/data
+  data-seriauth:
+    image: busybox:latest
+    volumes:
+      - seriauth_db:/var/lib/postgresql/data
+  hopix-core-db:
+    image: postgres:9.6.1
+    volumes_from:
+      - data-hopix-core
+    restart: always
+  seriauth-db:
+    image: postgres:9.6.1
+    volumes_from:
+      - data-seriauth
+    restart: always
+  hopix-web:
+    image: seribits/hopix-web:0.1.0
+    build:
+      context: ./hopix-web
+      dockerfile: ./Dockerfile
+    restart: always
+    env_file:
+      - ./hopix-web/envs/web.env
+  hopix-core:
+    image: seribits/hopix-core:0.1.0
+    build:
+      context: ./hopix-core
+      dockerfile: ./Dockerfile
+    restart: always
+    env_file:
+      - ./hopix-core/envs/core.env
+      - ./hopix-core/envs/core_db.env
+  seriauth:
+    build:
+      context: ./seriauth
+      dockerfile: ./Dockerfile
+    restart: always
+    env_file:
+      - ./seriauth/envs/seriauth.env
+  proxy:
+    image: seribits/hopix-proxy:0.1.0
+    build:
+      context: ./proxy
+      dockerfile: ./Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+volumes:
+  hopix_core_postgres:
+    external: true
+  seriauth_db:
+    external: true
